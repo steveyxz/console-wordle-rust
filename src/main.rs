@@ -36,42 +36,33 @@ fn main() {
 
     //Loop until the player has inputed a valid number for the round count, round count defaults
     //as 6, correlating to the real wordle.
-    let mut has_inputed_max_attempts = false;
-    let mut max_attempts: usize = 0;
-    while !has_inputed_max_attempts {
+    let mut max_attempts: usize = loop {
         print_with_style(
             "How many attempts would you like per round? (number 3-20)",
             &main_text_style,
             &terminal,
         );
-        let input: String = terminal.read_line().unwrap();
-        max_attempts = match input.parse::<usize>() {
-            Ok(result) => {
-                if result < 3 || result > 20 {
-                    print_with_style(
-                        "Make sure to enter a number between 3-20",
-                        &main_error_style,
-                        &terminal,
-                    );
-                } else {
-                    has_inputed_max_attempts = true;
-                }
-                result
-            }
+        let input: String = terminal.read_line().expect("Error while reading line");
+        if input.is_empty() {
+            break 6;
+        }
+        match input.parse::<usize>() {
+            Ok(result) if result >= 3 && result <= 20 => break result,
+            Ok(_) => print_with_style(
+                "Make sure to enter a number between 3-20",
+                &main_error_style,
+                &terminal,
+            ),
+
             Err(_) => {
-                if input == "" {
-                    has_inputed_max_attempts = true;
-                } else {
-                    print_with_style(
-                        "Make sure to enter a valid number!",
-                        &main_error_style,
-                        &terminal,
-                    );
-                }
-                6
+                print_with_style(
+                    "Make sure to enter a valid number!",
+                    &main_error_style,
+                    &terminal,
+                );
             }
         }
-    }
+    };
 
     loop {
         print_with_style(
@@ -112,7 +103,7 @@ fn main() {
 
     //Start wordle, create a game instance
     print_with_style(
-        ("Ok ".to_owned() + &name + &"! Your wordle will now begin!".to_owned()).as_str(),
+        (format!("Ok {} your wordle will now begin!", name)).as_str(),
         &main_text_style,
         &terminal,
     );

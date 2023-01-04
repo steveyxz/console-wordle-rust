@@ -72,7 +72,7 @@ pub struct GameState {
 impl GameState {
     //Assumes word is valid already -> won't do a validility check!
     //Returns true if the game is over, otherwise false
-    pub fn guess(&mut self, word: &String) -> bool {
+    pub fn guess<S: ToString>(&mut self, word: S) -> bool {
         self.guessed_words.push(word.to_string());
         self.current_guesses += 1;
         if self.is_over() {
