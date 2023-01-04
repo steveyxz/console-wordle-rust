@@ -51,7 +51,7 @@ impl GameState {
     }
 
     pub fn get_board(&self) -> String {
-        let mut board = String::new();
+        let mut board = String::from("▁▁▁▁▁\n");
         let empty = String::from("@@@@@");
         for i in 0..self.max_guesses {
             if i < self.guessed_words.len() {
@@ -64,6 +64,7 @@ impl GameState {
             }
             board.push_str("\n");
         }
+        board.push_str("▔▔▔▔▔");
         return board;
     }
 
