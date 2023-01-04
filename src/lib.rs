@@ -1,5 +1,9 @@
-use std;
+#[macro_use]
+extern crate json;
+
 use std::fmt::Display;
+use std::path::Path;
+use std::{self, fs};
 
 use console::Style;
 
@@ -8,6 +12,37 @@ pub struct GameWorldState {
     pub current_wins: i32,
     pub current_losses: i32,
     pub current_winstreak: i32,
+    pub is_saveable: bool,
+}
+
+impl GameWorldState {
+    pub fn load(&mut self) {
+        if !Path::new("data.json").exists() {
+            fs::write("data.json", "{}").expect("Error while reading data!");
+            self.save();
+            return;
+        }
+        let data = json::parse(fs::read_to_string("data.json").unwrap().as_str()).unwrap();
+        self.current_attempts = data["current_attempts"].as_i32().unwrap();
+        self.current_wins = data["current_wins"].as_i32().unwrap();
+        self.current_losses = data["current_losses"].as_i32().unwrap();
+        self.current_winstreak = data["current_winstreak"].as_i32().unwrap();
+    }
+
+    pub fn save(&self) {
+        if !self.is_saveable {
+            return;
+        }
+
+        let data = object! {
+            current_attempts: self.current_attempts,
+            current_wins: self.current_wins,
+            current_losses: self.current_losses,
+            current_winstreak: self.current_winstreak,
+        };
+
+        fs::write("data.json", data.dump()).expect("Error while writing data!");
+    }
 }
 
 impl std::fmt::Debug for GameWorldState {

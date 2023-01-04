@@ -18,6 +18,7 @@ fn main() {
         current_wins: 0,
         current_losses: 0,
         current_winstreak: 0,
+        is_saveable: true,
     };
     let terminal = Term::stdout();
 
@@ -69,6 +70,35 @@ fn main() {
                 }
                 6
             }
+        }
+    }
+
+    loop {
+        print_with_style(
+            "Do you want to save/load your stats? (y/n)",
+            &main_text_style,
+            &terminal,
+        );
+        let input: String = terminal.read_line().unwrap();
+        if input == "y" {
+            max_attempts = 6;
+            world_state.load();
+            print_with_style("Loaded data!", &success_style, &terminal);
+            print_with_style(
+                format_args!("{:?}", world_state).to_string().as_str(),
+                &success_style,
+                &terminal,
+            );
+            world_state.is_saveable = true;
+            break;
+        } else if input == "n" {
+            print_with_style(
+                "Your stats were not loaded, and will not save",
+                &main_text_style,
+                &terminal,
+            );
+            world_state.is_saveable = false;
+            break;
         }
     }
 
@@ -145,6 +175,7 @@ fn main() {
                     world_state.current_attempts += 1;
                     world_state.current_losses += 1;
                     world_state.current_winstreak = 0;
+                    break;
                 }
             } else {
                 print_with_style("Invalid word!", &main_error_style, &terminal);
@@ -153,6 +184,7 @@ fn main() {
                     .expect("Error while writing board to terminal!");
             }
         }
+        world_state.save();
         loop {
             print_with_style(
                 "Do you want to try again? (y/n)",
